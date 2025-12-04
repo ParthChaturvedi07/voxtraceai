@@ -4,6 +4,15 @@ import { authClient } from "@/lib/auth-client";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
+/**
+ * Root client component that renders session-aware authentication UI with signup and login forms.
+ *
+ * When a session exists, displays the signed-in user's name and a Sign Out button. When no session
+ * exists, displays two panels: a create-user form (name, email, password) and a login form (email,
+ * password), both wired to the authentication client.
+ *
+ * @returns The component's JSX element reflecting the current authentication state
+ */
 export default function Home() {
   const { data: session } = authClient.useSession();
 
