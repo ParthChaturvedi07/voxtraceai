@@ -61,7 +61,13 @@ const fragmentShader = `
   }
 `;
 
-// ShaderPlane component
+/**
+ * Renders a 2×2 shader-backed plane intended to cover the viewport and drive a procedural background.
+ *
+ * The component mounts a mesh with a shader material and updates the material's `u_time` and `u_resolution` uniforms on every frame.
+ *
+ * @returns A JSX mesh element containing a 2×2 plane with a shader material; the material exposes `u_time` and `u_resolution` uniforms that are updated each frame.
+ */
 function ShaderPlane() {
   const meshRef = useRef<THREE.Mesh>(null);
   const { size } = useThree();
@@ -94,7 +100,13 @@ function ShaderPlane() {
   );
 }
 
-// Badge component
+/**
+ * Renders a small inline badge container for displaying compact content.
+ *
+ * @param children - Content to display inside the badge
+ * @param className - Optional additional CSS classes to apply to the badge container
+ * @returns A styled `div` element that visually represents an inline badge containing `children`
+ */
 function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${className}`}>
@@ -103,7 +115,14 @@ function Badge({ children, className }: { children: React.ReactNode; className?:
   );
 }
 
-// Button component
+/**
+ * Render an interactive element that is an anchor when `href` is provided or a button otherwise.
+ *
+ * @param children - Content to render inside the element
+ * @param className - Optional CSS class names applied to the element
+ * @param href - Optional URL; when present the component renders an `<a>` with this `href`
+ * @returns An anchor element when `href` is provided, otherwise a button element
+ */
 function Button({ 
   children, 
   className, 
@@ -119,7 +138,11 @@ function Button({
   return <button className={className}>{children}</button>;
 }
 
-// Main Page Component
+/**
+ * Render the landing hero section with an animated Three.js shader background and GSAP-driven reveal animation for the badge, heading, description, call-to-action buttons, and micro details.
+ *
+ * @returns The page's hero section as a JSX element.
+ */
 export default function Page() {
   const sectionRef = useRef<HTMLElement>(null);
   const badgeWrapperRef = useRef<HTMLDivElement>(null);
