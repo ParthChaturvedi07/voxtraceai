@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OctagonAlertIcon } from "lucide-react";
-
+import { FaGithub, FaGoogle } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
@@ -61,11 +61,33 @@ export const SignUpView = () => {
         name: data.name,
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
           setPending(false);
           router.push("/");
+        },
+        onError: ({ error }) => {
+          setPending(false); // FIXED: Reset pending state on error
+          setError(error.message ?? "Invalid email or password");
+        },
+      }
+    );
+  };
+
+  const onSocial = (provider: "github" | "google") => {
+    setError(null);
+    setPending(true);
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          setPending(false);
         },
         onError: ({ error }) => {
           setPending(false); // FIXED: Reset pending state on error
@@ -87,9 +109,7 @@ export const SignUpView = () => {
                   <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text text-transparent [animation:gradient_3s_ease_infinite] [background-size:200%_auto]">
                     Let's get started
                   </h1>
-                  <p className="text-gray-400 text-base">
-                    Create your account
-                  </p>
+                  <p className="text-gray-400 text-base">Create your account</p>
                 </div>
 
                 {/* Name Field */}
@@ -220,19 +240,21 @@ export const SignUpView = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <Button
                     disabled={pending}
+                    onClick={() => onSocial("google")}
                     variant="outline"
                     type="button"
-                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 text-sm"
+                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 hover:text-white text-sm"
                   >
-                    Google
+                    <FaGoogle />
                   </Button>
                   <Button
                     disabled={pending}
+                    onClick={() => onSocial("github")}
                     variant="outline"
                     type="button"
-                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 text-sm"
+                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 hover:text-white text-sm"
                   >
-                    Github
+                    <FaGithub />
                   </Button>
                 </div>
 

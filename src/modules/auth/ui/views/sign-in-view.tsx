@@ -4,6 +4,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OctagonAlertIcon } from "lucide-react";
 
+import { FaGithub, FaGoogle } from "react-icons/fa";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
@@ -22,6 +24,7 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ro } from "date-fns/locale";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -49,11 +52,33 @@ export const SignInView = () => {
       {
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
           setPending(false);
           router.push("/");
+        },
+        onError: ({ error }) => {
+          setPending(false);
+          setError(error.message ?? "Invalid email or password");
+        },
+      }
+    );
+  };
+
+  const onSocial = (provider: "github" | "google") => {
+    setError(null);
+    setPending(true);
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          setPending(false);
         },
         onError: ({ error }) => {
           setPending(false); // FIXED: Reset pending state on error
@@ -132,14 +157,16 @@ export const SignInView = () => {
                 {!!error && (
                   <Alert className="bg-red-950/30 border-red-500/50 backdrop-blur-sm py-2">
                     <OctagonAlertIcon className="h-4 w-4 !text-red-400" />
-                    <AlertTitle className="text-red-400 text-sm">{error}</AlertTitle>
+                    <AlertTitle className="text-red-400 text-sm">
+                      {error}
+                    </AlertTitle>
                   </Alert>
                 )}
 
                 {/* Sign In Button */}
-                <Button 
-                  disabled={pending} 
-                  type="submit" 
+                <Button
+                  disabled={pending}
+                  type="submit"
                   className="w-full h-11 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-black font-semibold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 >
                   {pending ? "Signing in..." : "Sign In"}
@@ -157,21 +184,23 @@ export const SignInView = () => {
 
                 {/* OAuth Buttons */}
                 <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    disabled={pending} 
-                    variant="outline" 
-                    type="button" 
-                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 text-sm"
+                  <Button
+                    disabled={pending}
+                    onClick={() => onSocial("google")}
+                    variant="outline"
+                    type="button"
+                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 hover:text-white text-sm"
                   >
-                    Google
+                    <FaGoogle />
                   </Button>
-                  <Button 
-                    disabled={pending} 
-                    variant="outline" 
-                    type="button" 
-                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 text-sm"
+                  <Button
+                    disabled={pending}
+                    onClick={() => onSocial("github")}
+                    variant="outline"
+                    type="button"
+                    className="w-full h-10 bg-black/50 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/60 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 hover:text-white text-sm"
                   >
-                    Github
+                    <FaGithub />
                   </Button>
                 </div>
 
@@ -193,29 +222,41 @@ export const SignInView = () => {
           <div className="relative hidden md:flex flex-col gap-y-4 items-center justify-center bg-gradient-to-br from-emerald-950 via-black to-green-950 overflow-hidden">
             {/* Animated Background Glow */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.15),transparent_70%)]"></div>
-            
+
             {/* Floating Orbs */}
             <div className="absolute top-1/4 left-1/2 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-1/4 right-1/2 w-36 h-36 bg-green-500/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div
+              className="absolute bottom-1/4 right-1/2 w-36 h-36 bg-green-500/20 rounded-full blur-2xl animate-pulse"
+              style={{ animationDelay: "1s" }}
+            ></div>
 
             {/* Logo Container */}
             <div className="relative z-10 p-6 rounded-3xl bg-black/30 backdrop-blur-sm border border-emerald-500/20 shadow-2xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-500 hover:scale-105">
-              <img 
-                src="/logo.svg" 
-                alt="VoxTrace Logo" 
-                className="h-20 w-20 drop-shadow-[0_0_30px_rgba(16,185,129,0.6)]" 
+              <img
+                src="/logo.svg"
+                alt="VoxTrace Logo"
+                className="h-20 w-20 drop-shadow-[0_0_30px_rgba(16,185,129,0.6)]"
               />
             </div>
 
             {/* Brand Name */}
-            <p className="text-2xl font-bold text-white z-10 tracking-wide" style={{ textShadow: '0 0 20px rgba(16,185,129,0.5)' }}>
+            <p
+              className="text-2xl font-bold text-white z-10 tracking-wide"
+              style={{ textShadow: "0 0 20px rgba(16,185,129,0.5)" }}
+            >
               VoxTrace.AI
             </p>
 
             {/* Decorative Particles */}
             <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-emerald-400/60 rounded-full animate-ping"></div>
-            <div className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-emerald-400/60 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
-            <div className="absolute top-2/3 right-1/4 w-1 h-1 bg-green-400/60 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+            <div
+              className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-emerald-400/60 rounded-full animate-ping"
+              style={{ animationDelay: "0.5s" }}
+            ></div>
+            <div
+              className="absolute top-2/3 right-1/4 w-1 h-1 bg-green-400/60 rounded-full animate-ping"
+              style={{ animationDelay: "1s" }}
+            ></div>
           </div>
         </CardContent>
       </Card>
