@@ -157,8 +157,8 @@ export default function HomeView({ session }: { session: Session }) {
   const badgeText = "WORKFLOWS";
   const badgeLabel = "SUMMARIES & TRANSCRIPTS";
   const ctaButtons = [
-    { text: "Sign Up", href: "/sign-up", primary: true },
-    { text: "Sign In", href: "/sign-in", primary: false },
+    { text: "Agents", href: "/sign-up", primary: true },
+    { text: "Dashboard", href: "/dashboard", primary: false },
   ];
   const microDetails = [
     "Real-time AI agents",
