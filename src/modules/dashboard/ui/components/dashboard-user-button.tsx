@@ -11,12 +11,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
 import { ChevronDownIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
+
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 export const DashboardUserButton = () => {
   const router = useRouter();
-
+  const isMobile = useIsMobile();
   const { data, isPending } = authClient.useSession();
 
   const onLogout = () => {
@@ -31,6 +45,65 @@ export const DashboardUserButton = () => {
 
   if (isPending || !data?.user) {
     return null;
+  }
+
+  if (isMobile) {
+    return (
+      <Drawer>
+        <DrawerTrigger className="rounded-lg border border-primary/30 p-3 w-full flex items-center justify-between bg-white/5 hover:bg-white/10 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200 overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary/50">
+          <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
+            {data.user.image ? (
+              <Avatar className="size-9 shrink-0 ring-2 ring-primary/30">
+                <AvatarImage src={data.user.image} />
+              </Avatar>
+            ) : (
+              <GeneratedAvatar
+                seed={data.user.name || "User"}
+                variant="initials"
+                className="size-9 shrink-0 ring-2 ring-primary/30"
+              />
+            )}
+            <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
+              <p className="text-sm font-medium truncate w-full text-white">
+                {data.user.name}
+              </p>
+              <p className="text-xs truncate w-full text-gray-400">
+                {data.user.email}
+              </p>
+            </div>
+          </div>
+          <ChevronDownIcon className="size-4 shrink-0 text-gray-400 group-hover:text-primary transition-colors" />
+        </DrawerTrigger>
+        <DrawerContent className="glass-strong border-t border-primary/30 bg-[#0a0f1a]/95">
+          <DrawerHeader className="text-left border-b border-primary/20 pb-4">
+            <DrawerTitle className="text-white text-lg font-semibold">
+              {data.user.name}
+            </DrawerTitle>
+            <DrawerDescription className="text-gray-400 text-sm">
+              {data.user.email}
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter className="pt-4 pb-6 space-y-2">
+            <Button
+              variant="outline"
+              onClick={() => {}}
+              className="w-full border-primary/30 bg-white/5 hover:bg-white/10 hover:border-primary/50 text-white transition-all duration-200"
+            >
+              <CreditCardIcon className="size-4 mr-2" />
+              Billing
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={onLogout}
+              className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-200"
+            >
+              <LogOutIcon className="size-4 mr-2" />
+              Logout
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
   }
 
   return (
