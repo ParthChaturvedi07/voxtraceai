@@ -24,7 +24,6 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ro } from "date-fns/locale";
 
 const formSchema = z.object({
   email: z.string().email(),
