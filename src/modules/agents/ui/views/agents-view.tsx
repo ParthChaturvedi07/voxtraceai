@@ -7,15 +7,28 @@ import { ErrorState } from "@/components/alert-state";
 import { DataTable } from "../components/data-table";
 import { columns } from "../components/columns";
 import { EmptyState } from "@/components/empty-state";
+import { useAgentFilters } from "../../hooks/use-agents-filter";
+import { DataPagination } from "../components/data-pagination";
 
 export const AgentsView = () => {
+  const [filters, setFilters] = useAgentFilters();
+
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.agents.getMany.queryOptions());
+  const { data } = useSuspenseQuery(
+    trpc.agents.getMany.queryOptions({
+      ...filters,
+    }),
+  );
 
   return (
     <div>
-      <DataTable data={data} columns={columns} />
-      {data.length === 0 && (
+      <DataTable data={data.items} columns={columns} />
+      <DataPagination
+        page={filters.page}
+        totalPages={data.totalPages}
+        onOpenChange={(page) => setFilters({ page })}
+      />
+      {data.items.length === 0 && (
         <EmptyState
           title="Create your first agent"
           description="Create an agent that joins your meetings, follows your instructions, and actively interacts with participants in real time."
