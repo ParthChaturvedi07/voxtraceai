@@ -85,4 +85,49 @@ export const agentsRouter = createTRPCRouter({
 
             return createdAgent;
         }),
+    update: protectedProcedure
+        .input(
+            agentsInsertSchema.extend({
+                id: z.string(),
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const { id, ...updateData } = input;
+
+            const [updatedAgent] = await db
+                .update(agents)
+                .set(updateData)
+                .where(
+                    and(
+                        eq(agents.id, id),
+                        eq(agents.userId, ctx.auth.user.id),
+                    )
+                )
+                .returning();
+
+            if (!updatedAgent) {
+                throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
+            }
+
+            return updatedAgent;
+        }),
+        
+    remove: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+            const [deletedAgent] = await db
+                .delete(agents)
+                .where(
+                    and(
+                        eq(agents.id, input.id),
+                        eq(agents.userId, ctx.auth.user.id),
+                    )
+                )
+                .returning();
+
+            if (!deletedAgent) {
+                throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
+            }
+            return { success: true };
+        }),
 });
