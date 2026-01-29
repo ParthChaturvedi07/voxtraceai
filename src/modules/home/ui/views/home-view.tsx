@@ -157,7 +157,7 @@ export default function HomeView({ session }: { session: Session }) {
   const badgeText = "WORKFLOWS";
   const badgeLabel = "SUMMARIES & TRANSCRIPTS";
   const ctaButtons = [
-    { text: "Agents", href: "/agents", primary: true },
+    { text: "Agents", href: "/dashboard/agents", primary: true },
     { text: "Dashboard", href: "/dashboard", primary: false },
   ];
   const microDetails = [
