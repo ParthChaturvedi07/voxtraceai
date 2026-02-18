@@ -1,12 +1,31 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
 import { NewMeetingDialog } from "./new-meeting-dialog";
 import { useState } from "react";
+import { MeetingsSearchFilters } from "./meetings-search-filter";
+import { StatusFilter } from "./status-filter";
+import { AgentIdFilter } from "./agent-id-filter";
+import { useMeetingsFilters } from "../../hooks/use-meetings-filter";
+import { DEFAULT_PAGE } from "@/constants";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export const MeetingsListHeader = () => {
+  const [filters, setFilters] = useMeetingsFilters();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const isAnyFilterModified =
+    !!filters.status || !!filters.search || !!filters.agentId;
+
+  const onClearFilters = () => {
+    setFilters({
+      status: null,
+      agentId: "",
+      search: "",
+      page: DEFAULT_PAGE,
+    });
+  };
 
   return (
     <>
@@ -19,7 +38,7 @@ export const MeetingsListHeader = () => {
               My Meetings
             </h1>
             <p className="text-sm text-gray-400 mt-1">
-              Create and manage your AI meetings
+              Create and manage your AI-powered meetings
             </p>
           </div>
           <Button
@@ -33,7 +52,25 @@ export const MeetingsListHeader = () => {
         </div>
 
         {/* Filters Section */}
-        <div className="flex items-center gap-2">{/* TODO: Filters */}</div>
+        <ScrollArea>
+          <div className="flex flex-wrap items-center gap-2">
+            <MeetingsSearchFilters />
+            <StatusFilter />
+            <AgentIdFilter />
+            {isAnyFilterModified && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onClearFilters}
+                className="h-9 px-3 border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 hover:border-red-500/50 transition-all duration-200"
+              >
+                <XIcon className="size-4 mr-1.5" />
+                <span className="hidden sm:inline">Clear</span>
+              </Button>
+            )}
+          </div>
+          <ScrollBar />
+        </ScrollArea>
       </div>
     </>
   );

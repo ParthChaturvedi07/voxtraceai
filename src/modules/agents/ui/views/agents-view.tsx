@@ -8,7 +8,7 @@ import { DataTable } from "@/components/data-table";
 import { columns } from "../components/columns";
 import { EmptyState } from "@/components/empty-state";
 import { useAgentFilters } from "../../hooks/use-agents-filter";
-import { DataPagination } from "../components/data-pagination";
+import { DataPagination } from "@/components/data-pagination";
 import { useRouter } from "next/navigation";
 
 export const AgentsView = () => {
@@ -32,7 +32,7 @@ export const AgentsView = () => {
       <DataPagination
         page={filters.page}
         totalPages={data.totalPages}
-        onOpenChange={(page) => setFilters({ page })}
+        onPageChange={(page) => setFilters({ page })}
       />
       {data.items.length === 0 && (
         <EmptyState
