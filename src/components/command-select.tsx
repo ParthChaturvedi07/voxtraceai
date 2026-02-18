@@ -36,6 +36,11 @@ export const CommandSelect = ({
   const [open, setOpen] = useState(false);
   const selectedOption = options.find((option) => option.value === value);
 
+  const handleOpenChange = (open: boolean) => {
+    onSearch?.("");
+    setOpen(open);
+  };
+
   return (
     <>
       <Button
@@ -61,14 +66,11 @@ export const CommandSelect = ({
       <CommandResponsiveDialog
         shouldFilter={!onSearch}
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={handleOpenChange}
         title="Select an Option"
         description="Search and select from the list below"
       >
-        <CommandInput
-          placeholder="Search..."
-          onValueChange={onSearch}
-        />
+        <CommandInput placeholder="Search..." onValueChange={onSearch} />
         <CommandList className="p-1 pb-2">
           <CommandEmpty>
             <div className="flex flex-col items-center gap-2 py-4">
@@ -87,7 +89,7 @@ export const CommandSelect = ({
               }}
               className={cn(
                 value === option.value &&
-                  "bg-primary/20 text-primary border border-primary/30"
+                  "bg-primary/20 text-primary border border-primary/30",
               )}
             >
               {option.children}
