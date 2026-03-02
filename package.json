@@ -8,11 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "dev:webhook": "ngrok http --url=carissa-nonfaltering-unvascularly.ngrok-free.dev 3000"
   },
   "dependencies": {
     "@dicebear/collection": "^9.2.4",
     "@dicebear/core": "^9.2.4",
+    "@google/genai": "^1.43.0",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
@@ -44,6 +46,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/fiber": "^9.4.2",
     "@stream-io/node-sdk": "^0.7.42",
+    "@stream-io/openai-realtime-api": "^0.3.3",
     "@stream-io/video-react-sdk": "^1.32.4",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-table": "^8.21.3",
