@@ -18,7 +18,11 @@ export const meetingsRouter = createTRPCRouter({
                 id: ctx.auth.user.id,
                 name: ctx.auth.user.name,
                 role: "admin",
-                image: ctx.auth.user.image ?? generateAvatarUri({ seed: ctx.auth.user.id, variant: "initials" }),
+                image: ctx.auth.user.image ??
+                    generateAvatarUri({
+                        seed: ctx.auth.user.id,
+                        variant: "initials"
+                    }),
             }
         ])
 
@@ -45,22 +49,6 @@ export const meetingsRouter = createTRPCRouter({
                 })
                 .returning();
 
-            //TODO: Create stream calls, Upsert Stream Users
-
-            const [existingAgent] = await db
-                .select()
-                .from(agents)
-                .where(
-                    and(
-                        eq(agents.id, createdMeeting.agentId),
-                        eq(agents.userId, ctx.auth.user.id),
-                    )
-                );
-
-            if (!existingAgent) {
-                throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
-            }
-
             const call = streamVideo.video.call("default", createdMeeting.id);
             await call.create({
                 data: {
@@ -68,7 +56,6 @@ export const meetingsRouter = createTRPCRouter({
                     custom: {
                         meetingId: createdMeeting.id,
                         meetingName: createdMeeting.name,
-
                     },
                     settings_override: {
                         transcription: {
@@ -83,6 +70,21 @@ export const meetingsRouter = createTRPCRouter({
                     },
                 }
             });
+
+            const [existingAgent] = await db
+                .select()
+                .from(agents)
+                .where(
+                    and(
+                        eq(agents.id, createdMeeting.agentId),
+                        eq(agents.userId, ctx.auth.user.id),
+                    )
+                );
+
+
+            if (!existingAgent) {
+                throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
+            }
 
             await streamVideo.upsertUsers([
                 {
@@ -224,63 +226,4 @@ export const meetingsRouter = createTRPCRouter({
             const totalPages = Math.ceil(total.count / pageSize);
             return { items: data, total: total.count, totalPages };
         }),
-
-    // create: protectedProcedure
-    //     .input(meetingsInsertSchema)
-    //     .mutation(async ({ input, ctx }) => {
-    //         const [createdAgent] = await db
-    //             .insert(agents)
-    //             .values({
-    //                 ...input,
-    //                 userId: ctx.auth.user.id,
-    //             })
-    //             .returning();
-
-    //         return createdAgent;
-    //     }),
-    // update: protectedProcedure
-    //     .input(
-    //         agentsInsertSchema.extend({
-    //             id: z.string(),
-    //         })
-    //     )
-    //     .mutation(async ({ input, ctx }) => {
-    //         const { id, ...updateData } = input;
-
-    //         const [updatedAgent] = await db
-    //             .update(agents)
-    //             .set(updateData)
-    //             .where(
-    //                 and(
-    //                     eq(agents.id, id),
-    //                     eq(agents.userId, ctx.auth.user.id),
-    //                 )
-    //             )
-    //             .returning();
-
-    //         if (!updatedAgent) {
-    //             throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
-    //         }
-
-    //         return updatedAgent;
-    //     }),
-
-    // remove: protectedProcedure
-    //     .input(z.object({ id: z.string() }))
-    //     .mutation(async ({ input, ctx }) => {
-    //         const [deletedAgent] = await db
-    //             .delete(agents)
-    //             .where(
-    //                 and(
-    //                     eq(agents.id, input.id),
-    //                     eq(agents.userId, ctx.auth.user.id),
-    //                 )
-    //             )
-    //             .returning();
-
-    //         if (!deletedAgent) {
-    //             throw new TRPCError({ code: "NOT_FOUND", message: "Agent not found" });
-    //         }
-    //         return { success: true };
-    //     }),
 });
